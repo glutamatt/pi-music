@@ -46,11 +46,14 @@ pimusicApp.factory('mEntitiesLoader', ['$http' , function ($http) {
 }]);
 
 /* P L A Y E R */
-pimusicApp.factory('mPlayer', ['$http' , function ($http) {
+pimusicApp.factory('mPlayer', ['$rootScope', '$http' , function ($rootScope, $http) {
   return {
     startPlay: function ( songId , cb ) {
-      return $http.get('/play/songs/' + songId ).success(function(data){cb();}) ;
-    }
+      return $http.get('/play/songs/' + songId ).success(function(data){
+        $rootScope.playing = true ;
+        cb();}) ;
+    },
+    playPause: function() { $rootScope.playing = !$rootScope.playing ; }
   }
 }]) ;
 
@@ -115,9 +118,8 @@ pimusicApp.config(['$routeProvider',function($routeProvider) {
 /* C O N T R O L S */
 var pimusicControllers = angular.module('pimusicControllers', [ 'infinite-scroll' ] );
 pimusicControllers.controller('HeaderCtrl', // header
-  ['$scope' , function ( $scope ) {
-    $scope.playing = false ;
-    $scope.playPause = function() { $scope.playing = !$scope.playing ; } ;
+  ['$scope' , 'mPlayer', function ( $scope, mPlayer ) {
+    $scope.playPause = function() { mPlayer.playPause() ; } ;
 }]);
 pimusicControllers.controller('LoadCtrl', // preLoad
   ['$scope' , '$interval', 'mEntitiesLoader', function ( $scope, $interval, mEntitiesLoader ) {
