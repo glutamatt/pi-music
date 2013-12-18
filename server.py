@@ -35,6 +35,9 @@ def assets_template(name):
 @app.route('/assets/js/<name>')
 def assets_js(name):
     return send_file('assets/js/' + name)
+@app.route('/assets/img/<name>')
+def assets_img(name):
+    return send_file('assets/img/' + name)
 @app.route('/assets/api/<name>')
 def assets_api(name):
     return send_file('assets/api/' + name)

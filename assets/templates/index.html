@@ -16,13 +16,19 @@
         body { padding-top: 70px; }
         .tile-name { position: absolute; bottom: 0; left: 26px ; color: #fff; text-shadow: 1px 1px 1px #000; }
         .tile-image{ margin-bottom: 5px; width: 360px ; min-height: 185px ; }
+        .equalizer_on{background: url('/assets/img/ani_equalizer_black.gif') -10px no-repeat; opacity: 0.7;}
+        .equalizer_on:before{content: "\00a0"; }
     </style>
   <body>
 
     <!-- Static navbar -->
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="HeaderCtrl">
       <div class="navbar-header">
-        <a class="navbar-brand" href=""><span class="glyphicon glyphicon-play"></span> Play/Pause</a>
+        <a class="navbar-brand" href="" ng-click="playPause()">
+        <span class="glyphicon" ng-class="{false:'glyphicon-play', true :'glyphicon-pause'}[playing]"></span>
+        Play/Pause
+        <span class="glyphicon" ng-class="{equalizer_on:playing}"></span>
+        </a>
       </div>
     </div>
 

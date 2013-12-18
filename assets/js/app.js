@@ -96,6 +96,11 @@ pimusicApp.config(['$routeProvider',function($routeProvider) {
 
 /* C O N T R O L S */
 var pimusicControllers = angular.module('pimusicControllers', [ 'infinite-scroll' ] );
+pimusicControllers.controller('HeaderCtrl', // header
+  ['$scope' , function ( $scope ) {
+    $scope.playing = false ;
+    $scope.playPause = function() { $scope.playing = !$scope.playing ; } ;
+}]);
 pimusicControllers.controller('LoadCtrl', // preLoad
   ['$scope' , '$interval', 'mEntitiesLoader', function ( $scope, $interval, mEntitiesLoader ) {
     $scope.load = 0 ;
@@ -105,7 +110,6 @@ pimusicControllers.controller('LoadCtrl', // preLoad
       if( fake ) { $interval.cancel( fake ) ; fake = false ; }
       $scope.load = parseInt( (100-fakeval)*percent/100 ) + fakeval ;}) ;
     mEntitiesLoader.onLoadFinish(function( ) { $scope.finish = true ;}) ;
-    $scope.playPause = function() { alert('PLAYPAUSE HANDLE') } ;
 }]);
 pimusicControllers.controller('ArtistsCtrl', // Artists
   ['$scope', '$filter' , 'mEntities', function ($scope, $filter, mEntities ) {
