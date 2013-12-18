@@ -3,18 +3,20 @@ var pimusicApp = angular.module('pimusicApp',  ['ngRoute', 'pimusicControllers' 
 /* F I L T E R I N G */
 pimusicApp.filter('groupRow', function() {
   return function(items, groupedBy) {
-  	if (! items) return ; var finalItems = [],thisGroup; for (var i = 0; i < items.length; i++) {if (!thisGroup) {thisGroup = [];} thisGroup.push(items[i]); if (((i+1) % groupedBy) == 0) {finalItems.push(thisGroup); thisGroup = null; } } if (thisGroup) finalItems.push(thisGroup); return finalItems;
+  	if (! items) return ; var finalItems = [],thisGroup; for (var i = 0; i < items.length; i++) {
+      if (!thisGroup) {thisGroup = [];} thisGroup.push(items[i]); if (((i+1) % groupedBy) == 0) {
+        finalItems.push(thisGroup); thisGroup = null; } } if (thisGroup) finalItems.push(thisGroup); return finalItems;
   };
 });
 
 /* INFINITE SCROLL HANDLER */
 pimusicApp.factory( 'infiniteScrollHandler',  [ '$filter', function( $filter ){
-  return function( $scope, entities, sliceSize, methodeName ) {
-    var offset = 0 , slice = sliceSize ;
-    $scope.tilesGroups2 = [] ;
+  return function( $scope, entities, methodeName ) {
+    var offset = 0 , slice = 40 ;
+    $scope.tilesGroups = [] ;
     $scope[methodeName] = function(){ 
-      angular.forEach( $filter('groupRow')(entities.slice(offset, offset+slice ), 2),function(g) {
-        $scope.tilesGroups2.push(g) ;
+      angular.forEach( $filter('groupRow')(entities.slice(offset, offset+slice ), 4),function(g) {
+        $scope.tilesGroups.push(g) ;
       }) ; offset=offset+slice ; } ;
     $scope[methodeName]() ;
   } ;
@@ -129,16 +131,18 @@ pimusicControllers.controller('LoadCtrl', // preLoad
 }]);
 pimusicControllers.controller('ArtistsCtrl', // Artists
   ['$scope', 'mEntities', 'infiniteScrollHandler' , function ($scope, mEntities, infiniteScrollHandler ) {
-    infiniteScrollHandler( $scope,  mEntities.getAllArtists(), 20 , 'addSlice' ) ;
+    infiniteScrollHandler( $scope,  mEntities.getAllArtists() , 'addSlice' ) ;
     $scope.tileLinkUrl = function( tile ) { return '#/artists/' + tile.id ; } ;
+    $scope.tileType = 'artist' ;
 }]);
 pimusicControllers.controller('AlbumsCtrl', // Albums
   ['$scope' , 'mEntities', '$routeParams' , 'infiniteScrollHandler', function ($scope, mEntities, $routeParams , infiniteScrollHandler ) {
     var albums = ($routeParams.artistId) ? 
       mEntities.getAlbumsByArtistId($routeParams.artistId) : 
       mEntities.getAllAlbums() ;
-    infiniteScrollHandler( $scope,  albums , 20 , 'addSlice' ) ;
+    infiniteScrollHandler( $scope, albums , 'addSlice' ) ;
     $scope.tileLinkUrl = function( tile ) { return '#/albums/' + tile.id ; } ;
+    $scope.tileType = 'album' ;
 }]);
 pimusicControllers.controller('SongsCtrl', // Songs
   ['$scope', 'mEntities', '$routeParams', 'mPlayer' , function ($scope, mEntities, $routeParams, mPlayer  ) {
