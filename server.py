@@ -18,7 +18,7 @@ webclient = Webclient()
 webclient.login(get_conf().account['user'], get_conf().account['password'])
 devices = webclient.get_registered_devices()
 print devices
-f = open('api_songs_all.json', 'w')
+f = open('assets/api/songs_all.json', 'w')
 f.write(json.dumps(api.get_all_songs(), ensure_ascii=False).encode('utf-8'))
 f.close()
 #----end tpm
@@ -28,17 +28,16 @@ app.debug = True
 
 @app.route('/')
 def index():
-    return send_file('templates/index.html')
-@app.route('/partials/<name>')
-def template(name):
-    return send_file('templates/' + name)
-@app.route('/js/<name>')
-def assets(name):
-    return send_file('assets/' + name)
-
-@app.route("/api/songs/all/")
-def api_all_songs():
-    return send_file('api_songs_all.json')
+    return send_file('assets/templates/index.html')
+@app.route('/assets/templates/<name>')
+def assets_template(name):
+    return send_file('assets/templates/' + name)
+@app.route('/assets/js/<name>')
+def assets_js(name):
+    return send_file('assets/js/' + name)
+@app.route('/assets/api/<name>')
+def assets_api(name):
+    return send_file('assets/api/' + name)
 
 @app.route("/play/songs/<song_id>")
 def play_song_by_id(song_id):

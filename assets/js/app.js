@@ -12,7 +12,7 @@ pimusicApp.factory('mEntitiesLoader', ['$http' , function ($http) {
   var loadcb = { progress: [] ,finish: [] } ;
   return {
     load: function(callback) {
-      return $http.get('/api/songs/all/').success(function(data) {
+      return $http.get('/assets/api/songs_all.json').success(function(data) {
         var percent = -1 , newp = 0 ;
         angular.forEach(data, function ( song , i ) {
           callback(song, i) ;
@@ -85,7 +85,7 @@ pimusicApp.factory('mEntities', [ 'mEntitiesLoader' , function(mEntitiesLoader){
 
 /* R O U T I N G */
 pimusicApp.config(['$routeProvider',function($routeProvider) {
-	var prefix_partial = 'partials/' , resolve = {wait:'mEntitiesInit'} ;
+	var prefix_partial = '/assets/templates/' , resolve = {wait:'mEntitiesInit'} ;
     $routeProvider.
       when('/artists', {templateUrl: prefix_partial + 'tileset.html', controller: 'ArtistsCtrl', resolve:resolve}).
       when('/artists/:artistId',  {templateUrl: prefix_partial + 'tileset.html', controller: 'AlbumsCtrl', resolve:resolve}).

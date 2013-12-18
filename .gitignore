@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-api_songs_all.json
+songs_all.json
 config.py
