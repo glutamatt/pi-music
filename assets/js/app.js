@@ -48,12 +48,12 @@ pimusicApp.factory('mEntitiesLoader', ['$http' , function ($http) {
 /* P L A Y E R */
 pimusicApp.factory('mPlayer', ['$rootScope', '$http' , function ($rootScope, $http) {
   return {
-    startPlay: function ( songId , cb ) {
-      return $http.get('/play/songs/' + songId ).success(function(data){
+    playPause: function() { $rootScope.playing = !$rootScope.playing ; },
+    playList: function( songIds, startIndex, cb ) { console.log( songIds ) ; console.log( startIndex);
+      return $http.get('/play/songs/' + songIds[startIndex] ).success(function(data){
         $rootScope.playing = true ;
-        cb();}) ;
-    },
-    playPause: function() { $rootScope.playing = !$rootScope.playing ; }
+        cb();}) ;  
+    }
   }
 }]) ;
 
@@ -149,7 +149,10 @@ pimusicControllers.controller('AlbumsCtrl', // Albums
 pimusicControllers.controller('SongsCtrl', // Songs
   ['$scope', 'mEntities', '$routeParams', 'mPlayer' , function ($scope, mEntities, $routeParams, mPlayer  ) {
   	$scope.songs = mEntities.getSongsByAlbumId($routeParams.albumId) ;
-    $scope.playSong = function(song) { mPlayer.startPlay( song.id , function() {
-      console.log('song started : controller callback() !') ;
-    }) ; } ;
+    $scope.playSong = function(selectedSong) {
+      var ids = [], index = 0 ;
+      angular.forEach( $scope.songs , function( song, i ) { 
+        this.push(song.id) ; if( selectedSong == song) index = i ;  } , ids ) ;
+      mPlayer.playList( ids , index, function(){ console.log('cb start play') ; }) ;
+    } ;
 }]);
