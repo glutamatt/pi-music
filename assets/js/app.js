@@ -47,13 +47,14 @@ pimusicApp.factory('mEntitiesLoader', ['$http' , function ($http) {
 
 /* P L A Y E R */
 pimusicApp.factory('mPlayer', ['$rootScope', '$http' , function ($rootScope, $http) {
+  var setPlaying = function(isPlaying) { console.log(isPlaying);$rootScope.playing = Boolean(isPlaying) ; } ;
   return {
-    playPause: function() { $rootScope.playing = !$rootScope.playing ; },
-    playList: function( songIds, startIndex, cb ) { console.log( songIds ) ; console.log( startIndex);
-      return $http.get('/play/songs/' + songIds[startIndex] ).success(function(data){
-        $rootScope.playing = true ;
-        cb();}) ;  
-    }
+    playPause: function() { 
+      return $http.get('/play/playpause').success(function(data){setPlaying(parseInt(data));}) ; },
+    playList: function( songIds, startIndex, cb ) {
+      return $http.post('/play/list', {list:songIds,start:startIndex}).success(function(data){setPlaying(data);cb();});},
+    playOneSongId: function( songId , cb ) {
+      return this.playList( [songId] , 0 , cb ) ; }
   }
 }]) ;
 
