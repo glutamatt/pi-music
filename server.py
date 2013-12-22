@@ -86,4 +86,4 @@ def stream_by_song_id(song_id):
     return redirect(stream_url)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5989)
