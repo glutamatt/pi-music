@@ -1,5 +1,4 @@
-from flask import Flask
-import json
+from flask import Flask, url_for, redirect
 import mpd
 import config
 from gmusicapi import Mobileclient
@@ -14,6 +13,7 @@ logged_in = api.login(get_conf().account['user'], get_conf().account['password']
 
 #----tpm
 from gmusicapi import Webclient
+import json
 webclient = Webclient()
 webclient.login(get_conf().account['user'], get_conf().account['password'])
 devices = webclient.get_registered_devices()
@@ -21,6 +21,8 @@ print devices
 f = open('assets/api/songs_all.json', 'w')
 f.write(json.dumps(api.get_all_songs(), ensure_ascii=False).encode('utf-8'))
 f.close()
+import sys
+sys.exit(0)
 #----end tpm
 
 app = Flask(__name__)
@@ -48,10 +50,15 @@ def play_song_by_id(song_id):
     client.connect("localhost", 6600)
     client.stop()
     client.clear()
-    url = api.get_stream_url(song_id, get_conf().account['device'])
+    url = url_for('stream_by_song_id', song_id=song_id, _external=True)
     client.add(url)
     client.play()
     return url
+
+@app.route("/stream/<song_id>")
+def stream_by_song_id(song_id):
+    stream_url = api.get_stream_url(song_id, get_conf().account['device'])
+    return redirect(stream_url)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
