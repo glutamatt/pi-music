@@ -47,7 +47,7 @@ pimusicApp.factory('mEntitiesLoader', ['$http' , function ($http) {
 
 /* P L A Y E R */
 pimusicApp.factory('mPlayer', ['$rootScope', '$http' , function ($rootScope, $http) {
-  var setPlaying = function(isPlaying) { console.log(isPlaying);$rootScope.playing = Boolean(isPlaying) ; } ;
+  var setPlaying = function(isPlaying) { $rootScope.playing = Boolean(isPlaying) ; } ; setPlaying(false);
   return {
     playPause: function() { 
       return $http.get('/play/playpause').success(function(data){setPlaying(parseInt(data));}) ; },
@@ -112,6 +112,7 @@ pimusicApp.config(['$routeProvider',function($routeProvider) {
       when('/albums/:albumId',  {templateUrl: prefix_partial +  'songs.html',   controller: 'SongsCtrl', resolve:resolve}).
       when('/albums',           {templateUrl: prefix_partial +  'tileset.html',   controller: 'AlbumsCtrl', resolve:resolve}).
       when('/play/songs/:songId',  {templateUrl: prefix_partial +  'songs.html',   controller: 'SongsCtrl', resolve:resolve}).
+      when('/search',  {templateUrl: prefix_partial +  'search.html',   controller: 'SearchCtrl', resolve:resolve}).
       otherwise({redirectTo: '/artists'});
   }]);
 
@@ -121,6 +122,10 @@ var pimusicControllers = angular.module('pimusicControllers', [ 'infinite-scroll
 pimusicControllers.controller('HeaderCtrl', // header
   ['$scope' , 'mPlayer', function ( $scope, mPlayer ) {
     $scope.playPause = function() { mPlayer.playPause() ; } ;
+}]);
+pimusicControllers.controller('SearchCtrl', // Search
+  ['$scope' , function ($scope ) {
+    $scope.search = function() { console.log('search  : ' + $scope.query ) ; } ;
 }]);
 pimusicControllers.controller('LoadCtrl', // preLoad
   ['$scope' , '$interval', 'mEntitiesLoader', function ( $scope, $interval, mEntitiesLoader ) {
