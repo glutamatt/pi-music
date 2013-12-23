@@ -58,11 +58,28 @@ pimusicApp.factory('mPlayer', ['$rootScope', '$http' , function ($rootScope, $ht
   }
 }]) ;
 
+/* S E A R C H   E N G I N E  */
+pimusicApp.factory('searchEngine', [function () {
+  var index = lunr(function(){
+    this.field('title');
+    this.field('album');
+    this.field('artist');
+  });
+  return {
+    add: function( song ) {
+      return index.add( {
+        id: song.id, title: song.title, album: song.album.name, artist:song.artist.name
+      }) ;
+    },
+    search: function(query) { return index.search(query) ; }
+  }
+}]);
+
 /* E N T I T I E S */
 pimusicApp.factory('mEntitiesInit', ['mEntities' , function (mEntities) {
     return mEntities.init();
 }]);
-pimusicApp.factory('mEntities', [ 'mEntitiesLoader' , function(mEntitiesLoader){
+pimusicApp.factory('mEntities', [ 'mEntitiesLoader' , 'searchEngine', function(mEntitiesLoader, searchEngine){
   var musicIndex = { songs:{}, artists:{} , albums:{} } ;
   var iToa = function(io){ return Object.keys(io).map(function(i){return io[i];}) ; } ;
 	return {
@@ -84,22 +101,29 @@ pimusicApp.factory('mEntities', [ 'mEntitiesLoader' , function(mEntitiesLoader){
         if(song.hasOwnProperty('albumArtRef'))  albumArtUrl  = song.albumArtRef[0].url ;
 
         var eSong = { id:songId,title:song.title } , eAlbum, eArtist ;
-        if( !musicIndex.albums.hasOwnProperty(albumId)) eAlbum = { id:albumId, name:albumName, imageUrl:albumArtUrl, songs:{}} ;
-        else eAlbum = musicIndex.albums[albumId] ;
-        eSong.album = eAlbum ; eAlbum.songs[songId] = eSong ;
-        if( !musicIndex.artists.hasOwnProperty(artistId)) eArtist = { id:artistId, name:artistName, imageUrl:artistArtUrl, albums:{} } ;
-        else eArtist = musicIndex.artists[artistId] ;
+
+        if( musicIndex.artists.hasOwnProperty(artistId)) eArtist = musicIndex.artists[artistId] ;
+        else eArtist = { id:artistId, name:artistName, imageUrl:artistArtUrl, albums:{} } ;
+
+        if( musicIndex.albums.hasOwnProperty(albumId)) eAlbum = musicIndex.albums[albumId] ;
+        else eAlbum = { id:albumId, name:albumName, imageUrl:albumArtUrl, songs:{}, artist:eArtist} ;
+
+        eSong.album = eAlbum ;
+        eAlbum.songs[songId] = eSong ;
+        eSong.artist = eArtist ;
         eArtist.albums[albumId] = eAlbum ;
 
         musicIndex.songs[songId] = eSong ;
         musicIndex.albums[albumId] = eAlbum ;
         musicIndex.artists[artistId] = eArtist ;
 
+        searchEngine.add(eSong) ;
       });},
 		getAllArtists: function() { return iToa(musicIndex.artists) ;  } ,
 		getAlbumsByArtistId: function(artistId) { return iToa(musicIndex.artists[artistId].albums) ; },
     getAllAlbums: function() { return iToa(musicIndex.albums) ; },
-		getSongsByAlbumId: function(albumId){ return iToa(musicIndex.albums[albumId].songs) ; }
+		getSongsByAlbumId: function(albumId){ return iToa(musicIndex.albums[albumId].songs) ; },
+    getSongById:function(songId){ return musicIndex.songs[songId] ;}
 	};
 } ] ) ;
 
@@ -124,8 +148,17 @@ pimusicControllers.controller('HeaderCtrl', // header
     $scope.playPause = function() { mPlayer.playPause() ; } ;
 }]);
 pimusicControllers.controller('SearchCtrl', // Search
-  ['$scope' , function ($scope ) {
-    $scope.search = function() { console.log('search  : ' + $scope.query ) ; } ;
+  ['$scope' , 'searchEngine', 'mEntities', 'mPlayer' , '$timeout', function ($scope, searchEngine, mEntities, mPlayer, $timeout) {
+    var searchdelay;
+    $scope.search = function() { if (searchdelay) $timeout.cancel(searchdelay);
+      searchdelay = $timeout(function() {
+        $scope.songs = [] ;
+        angular.forEach(searchEngine.search($scope.query), function(result){
+          $scope.songs.push(mEntities.getSongById(result.ref));
+        }) ; 
+      }, 500 ) ;
+    } ;
+    $scope.playSong = function(song) {mPlayer.playOneSongId( song.id , function(){}) ;} ;
 }]);
 pimusicControllers.controller('LoadCtrl', // preLoad
   ['$scope' , '$interval', 'mEntitiesLoader', function ( $scope, $interval, mEntitiesLoader ) {
