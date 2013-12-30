@@ -1,9 +1,3 @@
 <input type="text" class="form-control" placeholder="Que va-t-on écouter ?" ng-change="search()" ng-model="query">
 
-<table class="table table-striped">
-	<tr ng-repeat="song in songs">
-		<td>{{ song.title }}</td>
-		<td><a href="" ng-click="playSong(song)"><span class="glyphicon glyphicon-play"></span> play</a></td>
-	</tr>
-</table>
-
+<ng-include src="'/assets/templates/songs.html'">

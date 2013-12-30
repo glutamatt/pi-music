@@ -9,7 +9,7 @@ pimusicApp.filter('groupRow', function() {
   };
 });
 
-/* INFINITE SCROLL HANDLER */
+/* I N F I N I T E   S C R O L L   H A N D L E R  */
 pimusicApp.factory( 'infiniteScrollHandler',  [ '$filter', function( $filter ){
   return function( $scope, entities, methodeName ) {
     var offset = 0 , slice = 40 ;
@@ -159,6 +159,8 @@ pimusicControllers.controller('SearchCtrl', // Search
       }, 500 ) ;
     } ;
     $scope.playSong = function(song) {mPlayer.playOneSongId( song.id , function(){}) ;} ;
+    $scope.artistUrl = function( artist ) { return '#/artists/' + artist.id ; } ;
+    $scope.albumUrl = function( album ) { return '#/albums/' + album.id ; } ;
 }]);
 pimusicControllers.controller('LoadCtrl', // preLoad
   ['$scope' , '$interval', 'mEntitiesLoader', function ( $scope, $interval, mEntitiesLoader ) {
@@ -188,6 +190,8 @@ pimusicControllers.controller('AlbumsCtrl', // Albums
 pimusicControllers.controller('SongsCtrl', // Songs
   ['$scope', 'mEntities', '$routeParams', 'mPlayer' , function ($scope, mEntities, $routeParams, mPlayer  ) {
   	$scope.songs = mEntities.getSongsByAlbumId($routeParams.albumId) ;
+    $scope.artistUrl = function( artist ) { return '#/artists/' + artist.id ; } ;
+    $scope.albumUrl = function( album ) { return '#/albums/' + album.id ; } ;
     $scope.playSong = function(selectedSong) {
       var ids = [], index = 0 ;
       angular.forEach( $scope.songs , function( song, i ) { 

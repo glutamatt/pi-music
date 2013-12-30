@@ -5,7 +5,7 @@
     <title>Pi Music</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css"> -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -18,6 +18,9 @@
         .tile-image{ width: 100% ;}
         .tile-link{ width: 100%;height: 0;display: inline-block;padding-bottom: 100%; }
         .tile-type-album{ padding-bottom: 100%; }.tile-type-artist{ padding-bottom: 50%; }
+        .song-img{ max-width:50px; }
+        .song-play-icon{position: absolute;top: -42px;left: 11px;color: #FFF;font-size: 30px;opacity: 0.8;}
+        .song-play-btn{position:relative;}
         .equalizer_on{background: url('/assets/img/ani_equalizer_black.gif') -10px no-repeat; opacity: 0.7;}
         .equalizer_on:before{content: "\00a0"; }
     </style>
@@ -42,20 +45,12 @@
     </div>
   </div>
 
-  <!-- Bread Crum -->
-  <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="#">Library</a></li>
-    <li class="active">Data</li>
-  </ol>
-
 <!-- Main View -->
  <div class="container" ng-view></div> <!-- /container -->
 
     <script src="https://code.jquery.com/jquery.js"></script>
-    <!--
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-
+    <!--
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular-route.min.js"></script>
       -->
