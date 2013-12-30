@@ -15,7 +15,11 @@ def get_mpd_client():
 
 def generate_data_file():
     import time, os, stat, sys
-    lifetime = time.time() - os.stat('assets/api/songs_all.json')[stat.ST_MTIME]
+    lifetime = 86401
+    try:
+        lifetime = time.time() - os.stat('assets/api/songs_all.json')[stat.ST_MTIME]
+    except Exception, e:
+        pass
     if lifetime < 86400 :
         return
     from gmusicapi import Webclient
