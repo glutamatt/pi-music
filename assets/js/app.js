@@ -136,7 +136,7 @@ pimusicApp.config(['$routeProvider',function($routeProvider) {
       when('/albums/:albumId',  {templateUrl: prefix_partial +  'songs.html',   controller: 'SongsCtrl', resolve:resolve}).
       when('/albums',           {templateUrl: prefix_partial +  'tileset.html',   controller: 'AlbumsCtrl', resolve:resolve}).
       when('/play/songs/:songId',  {templateUrl: prefix_partial +  'songs.html',   controller: 'SongsCtrl', resolve:resolve}).
-      when('/search',  {templateUrl: prefix_partial +  'search.html',   controller: 'SearchCtrl', resolve:resolve}).
+      when('/search',  {templateUrl: prefix_partial +  'search.html',   controller: 'SearchCtrl', resolve:resolve, reloadOnSearch: false}).
       otherwise({redirectTo: '/artists'});
   }]);
 
@@ -148,19 +148,28 @@ pimusicControllers.controller('HeaderCtrl', // header
     $scope.playPause = function() { mPlayer.playPause() ; } ;
 }]);
 pimusicControllers.controller('SearchCtrl', // Search
-  ['$scope' , 'searchEngine', 'mEntities', 'mPlayer' , '$timeout', function ($scope, searchEngine, mEntities, mPlayer, $timeout) {
+  ['$scope' , 'searchEngine', 'mEntities', 'mPlayer' , '$timeout', '$location', function ($scope, searchEngine, mEntities, mPlayer, $timeout, $location) {
     var searchdelay;
-    $scope.search = function() { if (searchdelay) $timeout.cancel(searchdelay);
-      searchdelay = $timeout(function() {
-        $scope.songs = [] ;
-        angular.forEach(searchEngine.search($scope.query), function(result){
-          $scope.songs.push(mEntities.getSongById(result.ref));
-        }) ; 
-      }, 500 ) ;
+    $scope.updateQuery = function() {
+      if (searchdelay) $timeout.cancel(searchdelay);
+      searchdelay = $timeout( function(){$location.search({q:$scope.query});} , 500 ) ;
     } ;
-    $scope.playSong = function(song) {mPlayer.playOneSongId( song.id , function(){}) ;} ;
+    var searchNow = function() {
+      angular.forEach(searchEngine.search($scope.query), function(result){
+        this.push(mEntities.getSongById(result.ref));
+      }, $scope.songs = []) ; 
+    } ;
+    $scope.playSong = function(song) { mPlayer.playOneSongId( song.id , function(){}) ;} ;
     $scope.artistUrl = function( artist ) { return '#/artists/' + artist.id ; } ;
     $scope.albumUrl = function( album ) { return '#/albums/' + album.id ; } ;
+    var onRouteUpdate = function() {
+      if( !$location.search().hasOwnProperty('q') ) return ;
+      $location.replace() ;
+      $scope.query = $location.search().q ; 
+      searchNow();
+    } ;
+    $scope.$on('$routeUpdate', onRouteUpdate );
+    onRouteUpdate() ;
 }]);
 pimusicControllers.controller('LoadCtrl', // preLoad
   ['$scope' , '$interval', 'mEntitiesLoader', function ( $scope, $interval, mEntitiesLoader ) {
