@@ -81,7 +81,7 @@ pimusicApp.factory('mEntitiesInit', ['mEntities' , function (mEntities) {
 }]);
 pimusicApp.factory('mEntities', [ 'mEntitiesLoader' , 'searchEngine', function(mEntitiesLoader, searchEngine){
   var musicIndex = { songs:{}, artists:{} , albums:{} } ;
-  var iToa = function(io){ return Object.keys(io).map(function(i){return io[i];}) ; } ;
+  var iToa = function(io){ return Object.keys(io).sort().map(function(i){return io[i];}) ; } ;
 	return {
     init: function(){ 
       return mEntitiesLoader.load(function(song){
@@ -119,11 +119,18 @@ pimusicApp.factory('mEntities', [ 'mEntitiesLoader' , 'searchEngine', function(m
 
         searchEngine.add(eSong) ;
       });},
-		getAllArtists: function() { return iToa(musicIndex.artists) ;  } ,
-		getAlbumsByArtistId: function(artistId) { return iToa(musicIndex.artists[artistId].albums) ; },
-    getAllAlbums: function() { return iToa(musicIndex.albums) ; },
-		getSongsByAlbumId: function(albumId){ return iToa(musicIndex.albums[albumId].songs) ; },
-    getSongById:function(songId){ return musicIndex.songs[songId] ;}
+		getAllArtists: function() {
+      if( this.cacheAllArtists == undefined ) this.cacheAllArtists = iToa(musicIndex.artists) ;
+      return this.cacheAllArtists ; } ,
+		getAlbumsByArtistId: function(artistId) {
+      return iToa(musicIndex.artists[artistId].albums) ; },
+    getAllAlbums: function() { 
+      if( this.cacheAllAlbums == undefined ) this.cacheAllAlbums = iToa(musicIndex.albums) ;
+      return  this.cacheAllAlbums ; },
+		getSongsByAlbumId: function(albumId){
+      return iToa(musicIndex.albums[albumId].songs) ; },
+    getSongById:function(songId){
+      return musicIndex.songs[songId] ;}
 	};
 } ] ) ;
 
@@ -205,6 +212,6 @@ pimusicControllers.controller('SongsCtrl', // Songs
       var ids = [], index = 0 ;
       angular.forEach( $scope.songs , function( song, i ) { 
         this.push(song.id) ; if( selectedSong == song) index = i ;  } , ids ) ;
-      mPlayer.playList( ids , index, function(){ console.log('cb start play') ; }) ;
+      mPlayer.playList( ids , index, function(){}) ;
     } ;
 }]);
